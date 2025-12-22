@@ -1,0 +1,9 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# System
+$RECYCLE.BIN/
+System Volume Information/
+Thumbs.db
