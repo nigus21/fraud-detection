@@ -3,7 +3,16 @@
 __pycache__/
 *.pyc
 
-# System
-$RECYCLE.BIN/
-System Volume Information/
+# Jupyter
+.ipynb_checkpoints/
+
+# Data
+data/
+*.csv
+
+# OS junk
+.DS_Store
 Thumbs.db
+
+# Logs
+*.log
