@@ -1,80 +1,90 @@
-Absolutely! Here’s a **professional, detailed README for Week 05 – Fraud Detection Project**, tailored to your workflow and code so far. You can copy it directly into `README.md`.
-
----
-
-````markdown
-# Week 05 — Fraud Detection for Adey Innovations Inc.
+# Week 05 & 06 — Fraud Detection for Adey Innovations Inc.
 
 ## Overview
 
-This project implements a **Fraud Detection Pipeline** on transactional data for Adey Innovations Inc. It focuses on **data analysis, preprocessing, feature engineering, and class imbalance handling** to build a machine learning-ready dataset. The pipeline is designed to uncover fraudulent transactions while preserving real-world constraints.
+This project implements an **end-to-end Fraud Detection System** for **e-commerce and bank transactions** at **Adey Innovations Inc.**  
+It covers the full machine learning lifecycle:
+
+- Data cleaning & exploratory analysis  
+- Feature engineering & geolocation integration  
+- Handling extreme class imbalance  
+- Model building, evaluation, and comparison  
+- Model explainability using **SHAP (Explainable AI)**  
+- Business-driven recommendations  
+
+The goal is to **accurately detect fraudulent transactions** while balancing **security, interpretability, and customer experience**.
 
 ---
 
 ## Table of Contents
 
 1. [Business Objective](#business-objective)  
-2. [Dataset](#dataset)  
+2. [Datasets](#datasets)  
 3. [Environment Setup](#environment-setup)  
 4. [Project Structure](#project-structure)  
-5. [Data Preprocessing & Feature Engineering](#data-preprocessing--feature-engineering)  
-6. [Handling Class Imbalance](#handling-class-imbalance)  
-7. [Modeling Readiness](#modeling-readiness)  
-8. [Usage](#usage)  
-9. [Key Lessons Learned](#key-lessons-learned)  
+5. [Task 1: Data Analysis & Preprocessing](#task-1-data-analysis--preprocessing)  
+6. [Task 2: Model Building & Evaluation](#task-2-model-building--evaluation)  
+7. [Task 3: Model Explainability (SHAP)](#task-3-model-explainability-shap)  
+8. [Results Summary](#results-summary)  
+9. [Usage](#usage)  
+10. [Key Lessons Learned](#key-lessons-learned)  
 
 ---
 
 ## Business Objective
 
-The goal of Week 05 is to:
+Adey Innovations Inc. aims to:
 
-- Prepare a **clean, feature-rich dataset** for fraud detection.
-- Identify **behavioral patterns and risk signals** in transactional data.
-- Address **class imbalance** to improve minority fraud detection.
-- Build a **reproducible preprocessing pipeline** ready for modeling.
+- Detect fraudulent transactions in **e-commerce** and **bank credit card data**
+- Minimize **false negatives** (missed fraud)
+- Control **false positives** to protect user experience
+- Build **interpretable models** suitable for real-world deployment
+- Enable **data-driven fraud prevention strategies**
 
 ---
 
-## Dataset
+## Datasets
 
-The dataset contains transactional and user information with the following key fields:
+### 1. Fraud_Data.csv (E-commerce Transactions)
 
-| Column             | Description |
-|-------------------|-------------|
-| `user_id`          | Unique user identifier |
-| `signup_time`      | Account creation timestamp |
-| `purchase_time`    | Transaction timestamp |
-| `purchase_value`   | Transaction amount |
-| `device_id`        | Device identifier |
-| `source`           | Traffic source |
-| `browser`          | Browser used |
-| `sex`              | User gender |
-| `age`              | User age |
-| `ip_address`       | Transaction IP address |
-| `class`            | Target variable: `1` = Fraud, `0` = Legitimate |
+| Column | Description |
+|------|-------------|
+| user_id | Unique user identifier |
+| signup_time | Account creation timestamp |
+| purchase_time | Transaction timestamp |
+| purchase_value | Transaction amount |
+| device_id | Device identifier |
+| source | Traffic source |
+| browser | Browser used |
+| sex | User gender |
+| age | User age |
+| ip_address | Transaction IP |
+| class | Target: 1 = Fraud, 0 = Legit |
+
+### 2. IpAddress_to_Country.csv
+
+Used to map IP ranges to countries for **geolocation fraud analysis**.
+
+### 3. creditcard.csv (Bank Transactions)
+
+| Column | Description |
+|------|-------------|
+| Time | Seconds since first transaction |
+| V1–V28 | PCA-anonymized features |
+| Amount | Transaction amount |
+| Class | Target: 1 = Fraud, 0 = Legit |
+
+⚠️ **Both datasets are highly imbalanced**, which strongly influences modeling choices.
 
 ---
 
 ## Environment Setup
 
-1. **Python & Virtual Environment**
 ```bash
 python -m venv .venv
-.venv\Scripts\activate  # Windows
+.venv\Scripts\activate      # Windows
 pip install --upgrade pip
-````
-
-2. **Install Dependencies**
-
-```bash
-pip install pandas numpy matplotlib seaborn scikit-learn imbalanced-learn
-```
-
-3. **Jupyter Notebook**
-
-```bash
-pip install notebook
+pip install -r requirements.txt
 jupyter notebook
 ```
 
@@ -83,125 +93,150 @@ jupyter notebook
 ## Project Structure
 
 ```
-week05/
+fraud-detection/
 │
-├── fraud-detection-for-Adey-Innovations-Inc/   # Project folder
-│   ├── data/                                  # Raw & processed data (ignored in git)
-│   ├── .venv/                                 # Virtual environment (ignored in git)
-│   ├── src/                                   # Source code & notebooks
-│   │   ├── task1_preprocessing.py             # Data cleaning & feature engineering
-│   │   └── ...
-│   ├── .gitignore
-│   └── README.md
+├── data/
+│   ├── raw/                # Original datasets (gitignored)
+│   └── processed/          # Cleaned & feature-engineered data
+│
+├── notebooks/
+│   ├── eda-fraud-data.ipynb
+│   ├── eda-creditcard.ipynb
+│   ├── feature-engineering.ipynb
+│   ├── modeling.ipynb
+│   └── shap-explainability.ipynb
+│
+├── models/                 # Saved trained models
+├── src/                    # Reusable scripts (optional)
+├── tests/                  # Unit tests (future extension)
+├── requirements.txt
+├── .gitignore
+└── README.md
 ```
 
 ---
 
-## Data Preprocessing & Feature Engineering
+## Task 1: Data Analysis & Preprocessing
 
-The preprocessing pipeline includes:
+### Key Steps
 
-1. **Data Cleaning**
+**Data Cleaning**
+- Removed duplicates
+- Corrected data types
+- Handled missing values with justified strategies
 
-   * Handle missing values via **dropping or imputation**
-   * Remove duplicates
-   * Correct data types (timestamps, numerics)
+**Exploratory Data Analysis**
+- Univariate & bivariate analysis
+- Fraud vs non-fraud distribution
+- Behavioral and monetary patterns
 
-2. **Exploratory Data Analysis (EDA)**
+**Feature Engineering**
+- `time_since_signup`
+- `hour_of_day`, `day_of_week`
+- Transaction frequency per user
+- IP-to-country geolocation features
 
-   * Class distribution analysis (fraud vs legitimate)
-   * Univariate & bivariate analysis for feature insights
+**Transformation**
+- One-hot encoding of categorical variables
+- Feature scaling for numerical variables
 
-3. **Feature Engineering**
-
-   * `time_since_signup` → captures behavioral urgency
-   * `hour_of_day` & `day_of_week` → detect temporal fraud patterns
-   * `transactions_per_user` → detect abnormal transaction frequency
-   * IP-to-country mapping for geo-risk analysis
-
-4. **Data Transformation**
-
-   * One-hot encoding of categorical variables (`source`, `browser`, `sex`, `country`)
-   * Scaling numeric features for model readiness
-
----
-
-## Handling Class Imbalance
-
-* The dataset is **highly imbalanced** (fraud is rare)
-* **SMOTE (Synthetic Minority Oversampling Technique)** is applied **only to the training set**
-* Preserves minority patterns while avoiding overfitting
+**Class Imbalance Handling**
+- Applied **SMOTE only on training data**
+- Preserved realistic test distribution
 
 ---
 
-## Modeling Readiness
+## Task 2: Model Building & Evaluation
 
-After preprocessing:
+### Models Trained
 
-* Features (`X_train_resampled`) are **all numeric**
-* Target (`y_train_resampled`) is balanced
-* Ready for **classification models**:
+**Baseline Model**
+- Logistic Regression (interpretable benchmark)
 
-  * Logistic Regression
-  * RandomForest / Gradient Boosted Trees
-  * XGBoost / LightGBM
+**Ensemble Model**
+- Random Forest Classifier
+- Basic hyperparameter tuning (`n_estimators`, `max_depth`)
+
+### Evaluation Metrics (Imbalanced-Aware)
+
+- **AUC–PR**
+- **F1-Score**
+- **Confusion Matrix**
+- Stratified 5-Fold Cross-Validation
+
+### Model Selection
+
+The final model was chosen based on:
+- Superior fraud recall
+- Strong precision–recall trade-off
+- Stability across folds
+- Interpretability support via SHAP
+
+---
+
+## Task 3: Model Explainability (SHAP)
+
+### Explainability Techniques
+
+- Built-in Random Forest feature importance
+- SHAP TreeExplainer for global & local explanations
+
+### Visualizations
+
+- SHAP Summary Plot (global importance)
+- SHAP Force Plots for:
+  - True Positive (correct fraud)
+  - False Positive (legitimate flagged)
+  - False Negative (missed fraud)
+
+### Insights
+
+- Temporal behavior and transaction velocity are strong fraud drivers
+- High-value transactions shortly after signup increase risk
+- Certain geolocations show elevated fraud likelihood
+
+---
+
+## Results Summary
+
+| Model | AUC-PR | F1-Score | Interpretability |
+|------|-------|---------|----------------|
+| Logistic Regression | Moderate | Moderate | High |
+| Random Forest | High | High | Medium (SHAP) |
+
+✅ **Random Forest** selected as the final model.
 
 ---
 
 ## Usage
 
-1. Activate the virtual environment:
-
+1. Activate environment:
 ```bash
 .venv\Scripts\activate
 ```
 
-2. Run the preprocessing script:
+2. Run notebooks in order:
+- `eda-fraud-data.ipynb`
+- `feature-engineering.ipynb`
+- `modeling.ipynb`
+- `shap-explainability.ipynb`
 
-```bash
-python src/task1_preprocessing.py
-```
-
-3. Split data and apply SMOTE:
-
-```python
-from sklearn.model_selection import train_test_split
-from imblearn.over_sampling import SMOTE
-```
-
-4. Train your ML model on `X_train_resampled` / `y_train_resampled` and evaluate on `X_test` / `y_test`.
+3. Review SHAP plots and business insights.
 
 ---
 
 ## Key Lessons Learned
 
-* Always **inspect data types** before applying transformations or SMOTE.
-* Never encode or scale columns multiple times in a notebook.
-* Keep **.gitignore** up to date to prevent committing system or environment files.
-* In fraud detection, **behavioral features and class balance** are more important than raw volume.
-* Maintain **reproducibility**: clean data → engineered features → balanced training set.
+- Fraud detection requires **precision–recall trade-offs**, not accuracy
+- Class imbalance handling is critical
+- Behavioral features outperform raw transaction values
+- Explainability builds **business trust** and actionable insight
+- SHAP is powerful but computationally expensive — sampling is essential
 
 ---
 
 ## Author
 
-**Nigus Dibekulu**
-Artificial Intelligence Track – Week 05: Fraud Detection
-
-```
-
----
-
-This README covers:
-
-- Theory & pipeline explanation  
-- Clear instructions to **run the code**  
-- Professional project structure  
-- Notes for interviews or project defense  
-
----
-
-I can also make a **shorter “GitHub-friendly version with badges and screenshots”** if you want it ready to share publicly.  
-
-Do you want me to do that next?
-```
+**Nigus Dibekulu**  
+Artificial Intelligence Mastery Program  
+Week 05 & 06 — Fraud Detection Project
