@@ -1,6 +1,7 @@
-# Week 05 & 06 — Fraud Detection for Adey Innovations Inc.
+Fraud Detection for Adey Innovations Inc. based on e-commerce and bank transactions.
 
-## Overview
+
+The goal is to **accurately detect fraudulent transactions** while balancing **security, interpretability, and customer experience**.
 
 This project implements an **end-to-end Fraud Detection System** for **e-commerce and bank transactions** at **Adey Innovations Inc.**  
 It covers the full machine learning lifecycle:
@@ -12,7 +13,6 @@ It covers the full machine learning lifecycle:
 - Model explainability using **SHAP (Explainable AI)**  
 - Business-driven recommendations  
 
-The goal is to **accurately detect fraudulent transactions** while balancing **security, interpretability, and customer experience**.
 
 ---
 
@@ -240,3 +240,4 @@ The final model was chosen based on:
 **Nigus Dibekulu**  
 Artificial Intelligence Mastery Program  
 Week 05 & 06 — Fraud Detection Project
+
